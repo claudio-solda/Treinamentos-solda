@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Treinamentos Solda</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e5f8c">
+<style>
+  :root{
+    --azul:#1e5f8c;
+    --azul-esc:#123f5c;
+    --azul-claro:#e8f2fa;
+    --dourado:#c9a227;
+    --verde:#2f7d4f;
+    --vermelho:#a33;
+    --muted:#6b7f92;
+    --bg:#f4f8fb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:#1a2b3c;
+    padding-bottom:50px;
+  }
+  header{
+    background:var(--azul);
+    color:#fff;
+    padding:16px;
+    text-align:center;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  header h1{margin:0;font-size:19px;}
+  header .sub{font-size:12px;color:#dcebf7;margin-top:2px;}
+  .voltar{
+    position:absolute;
+    left:12px;
+    top:16px;
+    color:#dcebf7;
+    text-decoration:none;
+    font-size:14px;
+    display:none;
+  }
+  .voltar.show{display:block;}
+
+  main{max-width:720px;margin:0 auto;padding:14px;}
+
+  /* ── DASHBOARD ── */
+  .resumo{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .resumo-card{
+    background:#fff;
+    border-radius:12px;
+    padding:12px;
+    text-align:center;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+  }
+  .resumo-card .num{font-size:24px;font-weight:700;color:var(--azul);}
+  .resumo-card .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  .btn-nova{
+    display:block;
+    width:100%;
+    background:var(--verde);
+    color:#fff;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:14px;
+    cursor:pointer;
+  }
+
+  /* ── CARDS DE TREINAMENTO ── */
+  .card{
+    background:#fff;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+    border-left:5px solid var(--azul);
+    cursor:pointer;
+  }
+  .card.risco-alto{border-left-color:var(--vermelho);}
+  .card.risco-medio{border-left-color:var(--dourado);}
+  .card-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .card-titulo{font-weight:700;font-size:15.5px;}
+  .card-categoria{font-size:11px;color:var(--muted);margin-top:2px;}
+  .card-progresso{
+    font-size:12px;
+    font-weight:700;
+    color:var(--azul);
+    white-space:nowrap;
+  }
+  .barra{
+    background:#e3ecf3;
+    border-radius:6px;
+    height:6px;
+    margin-top:8px;
+    overflow:hidden;
+  }
+  .barra-fill{background:var(--verde);height:100%;border-radius:6px;}
+
+  /* ── DETALHE DO TREINAMENTO ── */
+  .detalhe{display:none;}
+  .detalhe.show{display:block;}
+  .lista-principal.hide{display:none;}
+
+  .conteudo-box{
+    background:#fff;
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+    border-left:5px solid var(--dourado);
+  }
+  .conteudo-box h3{margin-top:0;font-size:15px;color:var(--azul-esc);}
+  .conteudo-box ul{padding-left:20px;margin:8px 0;}
+  .conteudo-box li{margin-bottom:6px;font-size:14.5px;line-height:1.4;}
+  .conteudo-box textarea{
+    width:100%;
+    min-height:110px;
+    border:1px solid #d5e0ea;
+    border-radius:8px;
+    padding:10px;
+    font-size:14px;
+    font-family:inherit;
+    resize:vertical;
+  }
+  .risco-tag{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:12px;
+    margin-bottom:8px;
+  }
+  .risco-tag.alto{background:#fbe4e4;color:var(--vermelho);}
+  .risco-tag.medio{background:#faf1d8;color:#8a6d10;}
+  .risco-tag.baixo{background:#e1f0e6;color:var(--verde);}
+
+  .checklist-titulo{
+    font-size:13px;
+    font-weight:700;
+    color:var(--muted);
+    margin:16px 0 8px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  .operador-row{
+    background:#fff;
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    box-shadow:0 1px 4px rgba(0,0,0,.05);
+  }
+  .operador-info{display:flex;align-items:center;gap:10px;flex:1;}
+  .operador-nome{font-size:14.5px;font-weight:600;}
+  .operador-data{font-size:11px;color:var(--muted);}
+  .check-btn{
+    width:26px;height:26px;
+    border-radius:50%;
+    border:2px solid #c7d4de;
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .check-btn.feito{background:var(--verde);border-color:var(--verde);color:#fff;}
+  .op-remover{
+    background:none;border:none;color:#c33;font-size:16px;cursor:pointer;padding:4px 6px;
+  }
+
+  .add-operador{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+  }
+  .add-operador input{
+    flex:1;
+    padding:10px;
+    border:1px solid #d5e0ea;
+    border-radius:8px;
+    font-size:14px;
+  }
+  .add-operador button{
+    background:var(--azul);
+    color:#fff;
+    border:none;
+    padding:0 16px;
+    border-radius:8px;
+    font-size:14px;
+    cursor:pointer;
+  }
+
+  .acoes-rodape{
+    display:flex;
+    gap:8px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .acoes-rodape button{
+    flex:1;
+    min-width:120px;
+    padding:11px;
+    border:none;
+    border-radius:9px;
+    font-size:13.5px;
+    font-weight:600;
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn-whats{background:#25d366;}
+  .btn-excluir{background:var(--vermelho);}
+  .btn-editar{background:#5b6f8c;}
+
+  .modal-fundo{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.4);
+    z-index:50;
+    align-items:center;justify-content:center;
+    padding:16px;
+  }
+  .modal-fundo.show{display:flex;}
+  .modal-box{
+    background:#fff;
+    border-radius:14px;
+    padding:20px;
+    max-width:420px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+  }
+  .modal-box h3{margin-top:0;}
+  .modal-box label{
+    display:block;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--muted);
+    margin:10px 0 4px;
+  }
+  .modal-box input, .modal-box select, .modal-box textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #d5e0ea;
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+  }
+  .modal-box textarea{min-height:90px;}
+  .modal-botoes{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+  }
+  .modal-botoes button{
+    flex:1;
+    padding:11px;
+    border:none;
+    border-radius:9px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .modal-cancelar{background:#e3ecf3;color:#1a2b3c;}
+  .modal-salvar{background:var(--verde);color:#fff;}
+
+  .rodape-app{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:24px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" class="voltar" id="btnVoltar" onclick="mostrarLista();return false;">← Voltar</a>
+  <h1 id="tituloTopo">🦺 Treinamentos Solda</h1>
+  <div class="sub" id="subTopo">Processo especial — capacitação e controle</div>
+</header>
+
+<main>
+
+  <!-- LISTA PRINCIPAL -->
+  <div id="listaPrincipal" class="lista-principal">
+
+    <div class="resumo">
+      <div class="resumo-card">
+        <div class="num" id="resumoTreinamentos">0</div>
+        <div class="lbl">Treinamentos cadastrados</div>
+      </div>
+      <div class="resumo-card">
+        <div class="num" id="resumoOperadores">0</div>
+        <div class="lbl">Operadores acompanhados</div>
+      </div>
+    </div>
+
+    <button class="btn-nova" onclick="abrirModalTreinamento()">➕ Novo treinamento</button>
+
+    <div id="cardsContainer"></div>
+  </div>
+
+  <!-- DETALHE -->
+  <div id="detalheTreinamento" class="detalhe"></div>
+
+  <div class="rodape-app">© Irmão Claudio</div>
+</main>
+
+<!-- MODAL: novo/editar treinamento -->
+<div class="modal-fundo" id="modalTreinamento">
+  <div class="modal-box">
+    <h3 id="modalTreinoTitulo">Novo treinamento</h3>
+    <input type="hidden" id="treinoEditId">
+    <label>Nome do treinamento</label>
+    <input type="text" id="treinoNome" placeholder="Ex: Verificação de eletrodos">
+    <label>Categoria</label>
+    <input type="text" id="treinoCategoria" placeholder="Ex: Processo / Segurança / Qualidade">
+    <label>Nível de risco</label>
+    <select id="treinoRisco">
+      <option value="alto">Alto</option>
+      <option value="medio">Médio</option>
+      <option value="baixo">Baixo</option>
+    </select>
+    <label>Conteúdo / pontos a treinar (uma linha por item)</label>
+    <textarea id="treinoConteudo" placeholder="- Ponto 1&#10;- Ponto 2"></textarea>
+    <div class="modal-botoes">
+      <button class="modal-cancelar" onclick="fecharModalTreinamento()">Cancelar</button>
+      <button class="modal-salvar" onclick="salvarTreinamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DADOS_KEY = 'treinamentos_solda_dados_v1';
+
+// Catálogo inicial sugerido (todos os treinamentos possíveis para o setor)
+const CATALOGO_PADRAO = [
+  {
+    id: 'proc-especial',
+    nome: 'Solda por resistência é processo especial',
+    categoria: 'Conceito / Qualidade',
+    risco: 'alto',
+    conteudo: [
+      'A solda não pode ser 100% verificada só de olho depois de pronta — é um "processo especial" (IATF 16949 / ISO 9001).',
+      'O resultado depende de tudo estar certo ANTES de rodar: parâmetro, dispositivo, eletrodo, posicionamento da peça.',
+      'Erro no processo especial não aparece na hora — aparece como refugo, retrabalho ou falha no cliente.',
+      '"Ficar uns minutos na máquina" não forma operador — ele precisa entender o porquê de cada etapa.'
+    ]
+  },
+  {
+    id: 'parametros',
+    nome: 'Parâmetros de solda (corrente, tempo, pressão)',
+    categoria: 'Processo',
+    risco: 'alto',
+    conteudo: [
+      'Corrente (kA), tempo de solda (ciclos), squeeze/hold time e pressão pneumática devem estar dentro do especificado.',
+      'Nenhuma máquina roda sem o parâmetro validado pelo responsável do turno.',
+      'Rodar peça teste antes de liberar produção em série.',
+      'Validação: torque e teste de arrancamento conforme plano de controle.'
+    ]
+  },
+  {
+    id: 'posicionamento-peca',
+    nome: 'Posicionamento correto da peça/porca no dispositivo',
+    categoria: 'Processo',
+    risco: 'alto',
+    conteudo: [
+      'Conferir se a porca/peça está encaixada e centralizada no dispositivo antes de acionar.',
+      'Porca deslocada compromete rosca/fixação e gera refugo em série se não for percebido.',
+      'Inspecionar visualmente a primeira peça de cada troca de lote ou turno.'
+    ]
+  },
+  {
+    id: 'eletrodos',
+    nome: 'Verificação e alinhamento de eletrodos',
+    categoria: 'Processo',
+    risco: 'medio',
+    conteudo: [
+      'Checar alinhamento e desgaste do eletrodo antes de iniciar a peça.',
+      'Eletrodo gasto ou desalinhado altera a solda mesmo com parâmetro certo.',
+      'Trocar/retificar eletrodo conforme padrão do plano de controle.'
+    ]
+  },
+  {
+    id: 'identificar-defeitos',
+    nome: 'Identificação de defeitos comuns',
+    categoria: 'Qualidade',
+    risco: 'medio',
+    conteudo: [
+      'Reconhecer: queima ao redor do furo, respingo excessivo, porca torta/deslocada, marca de esmagamento.',
+      'Qualquer marca estranha: parar a máquina e chamar o encarregado — não seguir produzindo tentando resolver sozinho.'
+    ]
+  },
+  {
+    id: 'parada-chamado',
+    nome: 'Procedimento de parada e chamado ao encarregado',
+    categoria: 'Segurança / Processo',
+    risco: 'alto',
+    conteudo: [
+      'Diante de qualquer dúvida ou anomalia, o operador em treinamento deve parar a máquina imediatamente.',
+      'Chamar o responsável do turno antes de continuar a produção.',
+      'Nunca decidir sozinho por "resolver" um problema fora do que foi treinado.'
+    ]
+  },
+  {
+    id: 'epi',
+    nome: 'Uso correto de EPI',
+    categoria: 'Segurança',
+    risco: 'alto',
+    conteudo: [
+      'Óculos de proteção, luvas apropriadas e protetor auricular quando aplicável, o tempo todo.',
+      'Verificar estado de conservação do EPI antes de iniciar o turno.'
+    ]
+  },
+  {
+    id: 'riscos-especificos',
+    nome: 'Riscos específicos da solda por resistência',
+    categoria: 'Segurança',
+    risco: 'alto',
+    conteudo: [
+      'Queimadura por contato ou projeção de respingo.',
+      'Prensagem/esmagamento na região dos eletrodos.',
+      'Choque elétrico e ruído do processo.'
+    ]
+  },
+  {
+    id: 'instrucao-trabalho',
+    nome: 'Leitura da Instrução de Trabalho e Plano de Controle',
+    categoria: 'Processo',
+    risco: 'medio',
+    conteudo: [
+      'Plano de Controle: o que controlar, especificação, frequência e responsável.',
+      'Instrução de Trabalho: passo a passo, parâmetros, fotos de referência e EPIs.',
+      'Operador em treinamento deve saber localizar e ler esses documentos antes de operar sozinho.'
+    ]
+  },
+  {
+    id: 'retrabalho-contencao',
+    nome: 'Retrabalho e contenção de peças suspeitas',
+    categoria: 'Qualidade',
+    risco: 'medio',
+    conteudo: [
+      'Peça fora do padrão deve ser separada (contenção), nunca misturada com peça boa.',
+      'Registrar retrabalho e comunicar liderança/qualidade.'
+    ]
+  }
+];
+
+let dados = carregarDados();
+let treinamentoAtual = null;
+
+function carregarDados(){
+  try{
+    const salvo = localStorage.getItem(DADOS_KEY);
+    if(salvo) return JSON.parse(salvo);
+  }catch(e){}
+  // Primeira vez: monta a partir do catálogo padrão
+  return {
+    treinamentos: CATALOGO_PADRAO.map(t => ({...t, operadores: []}))
+  };
+}
+
+function salvarDados(){
+  localStorage.setItem(DADOS_KEY, JSON.stringify(dados));
+}
+
+function riscoLabel(r){
+  return r === 'alto' ? 'Risco alto' : r === 'medio' ? 'Risco médio' : 'Risco baixo';
+}
+
+function renderLista(){
+  const cont = document.getElementById('cardsContainer');
+  cont.innerHTML = '';
+  let totalOperadoresUnicos = new Set();
+
+  dados.treinamentos.forEach(t => {
+    const total = t.operadores.length;
+    const feitos = t.operadores.filter(o => o.concluido).length;
+    const pct = total > 0 ? Math.round((feitos/total)*100) : 0;
+    t.operadores.forEach(o => totalOperadoresUnicos.add(o.nome.trim().toLowerCase()));
+
+    const card = document.createElement('div');
+    card.className = `card risco-${t.risco}`;
+    card.onclick = () => abrirDetalhe(t.id);
+    card.innerHTML = `
+      <div class="card-topo">
+        <div>
+          <div class="card-titulo">${t.nome}</div>
+          <div class="card-categoria">${t.categoria}</div>
+        </div>
+        <div class="card-progresso">${feitos}/${total}</div>
+      </div>
+      <div class="barra"><div class="barra-fill" style="width:${pct}%"></div></div>
+    `;
+    cont.appendChild(card);
+  });
+
+  document.getElementById('resumoTreinamentos').textContent = dados.treinamentos.length;
+  document.getElementById('resumoOperadores').textContent = totalOperadoresUnicos.size;
+}
+
+function mostrarLista(){
+  treinamentoAtual = null;
+  document.getElementById('listaPrincipal').classList.remove('hide');
+  document.getElementById('detalheTreinamento').classList.remove('show');
+  document.getElementById('btnVoltar').classList.remove('show');
+  document.getElementById('tituloTopo').textContent = '🦺 Treinamentos Solda';
+  document.getElementById('subTopo').textContent = 'Processo especial — capacitação e controle';
+  renderLista();
+}
+
+function abrirDetalhe(id){
+  treinamentoAtual = id;
+  document.getElementById('listaPrincipal').classList.add('hide');
+  document.getElementById('detalheTreinamento').classList.add('show');
+  document.getElementById('btnVoltar').classList.add('show');
+  renderDetalhe();
+}
+
+function renderDetalhe(){
+  const t = dados.treinamentos.find(x => x.id === treinamentoAtual);
+  if(!t){ mostrarLista(); return; }
+
+  document.getElementById('tituloTopo').textContent = t.nome;
+  document.getElementById('subTopo').textContent = t.categoria;
+
+  const total = t.operadores.length;
+  const feitos = t.operadores.filter(o => o.concluido).length;
+
+  const itensConteudo = t.conteudo.map(c => `<li>${c}</li>`).join('');
+  const operadoresHtml = t.operadores.map((o, idx) => `
+    <div class="operador-row">
+      <div class="operador-info">
+        <div class="check-btn ${o.concluido ? 'feito' : ''}" onclick="toggleOperador('${t.id}', ${idx})">${o.concluido ? '✓' : ''}</div>
+        <div>
+          <div class="operador-nome">${o.nome}</div>
+          <div class="operador-data">${o.concluido && o.data ? 'Concluído em ' + o.data : 'Pendente'}</div>
+        </div>
+      </div>
+      <button class="op-remover" onclick="removerOperador('${t.id}', ${idx})">✕</button>
+    </div>
+  `).join('') || '<div style="font-size:13px;color:var(--muted);padding:6px 0;">Nenhum operador adicionado ainda.</div>';
+
+  const div = document.getElementById('detalheTreinamento');
+  div.innerHTML = `
+    <div class="conteudo-box">
+      <span class="risco-tag ${t.risco}">${riscoLabel(t.risco)}</span>
+      <h3>📋 Pontos do treinamento</h3>
+      <ul>${itensConteudo}</ul>
+    </div>
+
+    <div class="checklist-titulo">Checklist — ${feitos}/${total} concluídos</div>
+    ${operadoresHtml}
+
+    <div class="add-operador">
+      <input type="text" id="novoOperadorNome" placeholder="Nome do operador">
+      <button onclick="adicionarOperador('${t.id}')">Adicionar</button>
+    </div>
+
+    <div class="acoes-rodape">
+      <button class="btn-editar" onclick="editarTreinamento('${t.id}')">✏️ Editar</button>
+      <button class="btn-whats" onclick="enviarResumoWhats('${t.id}')">🟢 Enviar resumo</button>
+      <button class="btn-excluir" onclick="excluirTreinamento('${t.id}')">🗑️ Excluir</button>
+    </div>
+  `;
+}
+
+function toggleOperador(tid, idx){
+  const t = dados.treinamentos.find(x => x.id === tid);
+  const op = t.operadores[idx];
+  op.concluido = !op.concluido;
+  op.data = op.concluido ? new Date().toLocaleDateString('pt-BR') : null;
+  salvarDados();
+  renderDetalhe();
+}
+
+function removerOperador(tid, idx){
+  if(!confirm('Remover este operador do treinamento?')) return;
+  const t = dados.treinamentos.find(x => x.id === tid);
+  t.operadores.splice(idx, 1);
+  salvarDados();
+  renderDetalhe();
+}
+
+function adicionarOperador(tid){
+  const input = document.getElementById('novoOperadorNome');
+  const nome = input.value.trim();
+  if(!nome) return;
+  const t = dados.treinamentos.find(x => x.id === tid);
+  if(t.operadores.some(o => o.nome.toLowerCase() === nome.toLowerCase())){
+    alert('Esse operador já está na lista deste treinamento.');
+    return;
+  }
+  t.operadores.push({nome, concluido:false, data:null});
+  input.value = '';
+  salvarDados();
+  renderDetalhe();
+}
+
+function excluirTreinamento(tid){
+  if(!confirm('Excluir este treinamento e todo o checklist dele?')) return;
+  dados.treinamentos = dados.treinamentos.filter(x => x.id !== tid);
+  salvarDados();
+  mostrarLista();
+}
+
+function enviarResumoWhats(tid){
+  const t = dados.treinamentos.find(x => x.id === tid);
+  const total = t.operadores.length;
+  const feitos = t.operadores.filter(o => o.concluido).length;
+  let msg = `🦺 *Treinamento: ${t.nome}*\n`;
+  msg += `📂 ${t.categoria} — ${riscoLabel(t.risco)}\n\n`;
+  msg += `✅ Concluídos: ${feitos}/${total}\n\n`;
+  t.operadores.forEach(o => {
+    msg += `${o.concluido ? '✅' : '⏳'} ${o.nome}${o.concluido && o.data ? ' — ' + o.data : ''}\n`;
+  });
+  const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+// ── MODAL NOVO/EDITAR TREINAMENTO ──
+function abrirModalTreinamento(){
+  document.getElementById('modalTreinoTitulo').textContent = 'Novo treinamento';
+  document.getElementById('treinoEditId').value = '';
+  document.getElementById('treinoNome').value = '';
+  document.getElementById('treinoCategoria').value = '';
+  document.getElementById('treinoRisco').value = 'medio';
+  document.getElementById('treinoConteudo').value = '';
+  document.getElementById('modalTreinamento').classList.add('show');
+}
+
+function editarTreinamento(tid){
+  const t = dados.treinamentos.find(x => x.id === tid);
+  document.getElementById('modalTreinoTitulo').textContent = 'Editar treinamento';
+  document.getElementById('treinoEditId').value = t.id;
+  document.getElementById('treinoNome').value = t.nome;
+  document.getElementById('treinoCategoria').value = t.categoria;
+  document.getElementById('treinoRisco').value = t.risco;
+  document.getElementById('treinoConteudo').value = t.conteudo.join('\n');
+  document.getElementById('modalTreinamento').classList.add('show');
+}
+
+function fecharModalTreinamento(){
+  document.getElementById('modalTreinamento').classList.remove('show');
+}
+
+function salvarTreinamento(){
+  const editId = document.getElementById('treinoEditId').value;
+  const nome = document.getElementById('treinoNome').value.trim();
+  const categoria = document.getElementById('treinoCategoria').value.trim() || 'Geral';
+  const risco = document.getElementById('treinoRisco').value;
+  const conteudo = document.getElementById('treinoConteudo').value
+    .split('\n').map(l => l.replace(/^-\s*/,'').trim()).filter(l => l);
+
+  if(!nome){ alert('Digite o nome do treinamento.'); return; }
+  if(conteudo.length === 0){ alert('Adicione ao menos um ponto de conteúdo.'); return; }
+
+  if(editId){
+    const t = dados.treinamentos.find(x => x.id === editId);
+    t.nome = nome; t.categoria = categoria; t.risco = risco; t.conteudo = conteudo;
+  } else {
+    const id = 'custom-' + Date.now();
+    dados.treinamentos.push({id, nome, categoria, risco, conteudo, operadores:[]});
+  }
+
+  salvarDados();
+  fecharModalTreinamento();
+  if(editId){ renderDetalhe(); } else { mostrarLista(); }
+}
+
+// Init
+mostrarLista();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
