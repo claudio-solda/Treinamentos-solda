@@ -1,0 +1,21 @@
+{
+  "name": "Treinamentos Solda",
+  "short_name": "Treinamentos",
+  "description": "Catálogo de treinamentos e checklist de capacitação para operadores de solda por resistência",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f8fb",
+  "theme_color": "#1e5f8c",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
